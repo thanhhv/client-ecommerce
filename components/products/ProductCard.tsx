@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
-import { useCartStore } from "@/lib/stores/cartStore";
+import { useAddToCart } from "@/lib/hooks/useAddToCart";
 import PriceDisplay from "@/components/shared/PriceDisplay";
 import StockBadge from "@/components/shared/StockBadge";
 import type { ProductSummary } from "@/lib/types/product";
@@ -13,17 +13,16 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const { addItem, setDrawerOpen } = useCartStore();
+  const addToCart = useAddToCart();
 
   function handleAddToCart() {
-    addItem({
+    addToCart({
       productId: product.id,
       name: product.name,
       imageUrl: product.primaryImageUrl ?? "",
       price: product.salePrice ?? product.basePrice,
       quantity: 1,
     });
-    setDrawerOpen(true);
   }
 
   return (
@@ -49,7 +48,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       <div className="p-4 flex flex-col gap-2 flex-1">
         <Link href={`/products/${product.slug}`} className="flex-1">
           <p className="text-sm text-plant-muted line-clamp-1">
-            {product.brand ?? "Cây Xanh"}
+            {product.brand ?? "Thế giới cây xanh"}
           </p>
           <h3 className="font-medium text-plant-text text-sm line-clamp-2 mt-0.5 leading-snug">
             {product.name}

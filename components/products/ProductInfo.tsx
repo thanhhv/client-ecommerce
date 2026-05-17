@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ShoppingCart, Zap } from "lucide-react";
 import { useCartStore } from "@/lib/stores/cartStore";
+import { useAddToCart } from "@/lib/hooks/useAddToCart";
 import PriceDisplay from "@/components/shared/PriceDisplay";
 import StockBadge from "@/components/shared/StockBadge";
 import BreadCrumb from "@/components/shared/BreadCrumb";
@@ -15,13 +16,14 @@ interface ProductInfoProps {
 
 export default function ProductInfo({ product }: ProductInfoProps) {
   const router = useRouter();
-  const { addItem, setDrawerOpen } = useCartStore();
+  const { setDrawerOpen } = useCartStore();
+  const addToCart = useAddToCart();
   const [qty, setQty] = useState(1);
 
   const primaryImage = product.images.find((img) => img.isPrimary) ?? product.images[0];
 
-  function handleAddToCart() {
-    addItem({
+  async function handleAddToCart() {
+    await addToCart({
       productId: product.id,
       name: product.name,
       imageUrl: primaryImage?.url ?? "",
@@ -31,8 +33,8 @@ export default function ProductInfo({ product }: ProductInfoProps) {
     setDrawerOpen(true);
   }
 
-  function handleBuyNow() {
-    addItem({
+  async function handleBuyNow() {
+    await addToCart({
       productId: product.id,
       name: product.name,
       imageUrl: primaryImage?.url ?? "",

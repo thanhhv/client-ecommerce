@@ -7,10 +7,10 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
             <div className="font-playfair text-xl font-bold mb-3">
-              🌿 Cây Xanh
+              🌿 Thế giới cây xanh
             </div>
             <p className="text-gray-400 text-sm">
-              Mang thiên nhiên vào ngôi nhà của bạn. Cây xanh tươi, giao hàng
+              Mang thiên nhiên vào ngôi nhà của bạn. Thế giới cây xanh tươi, giao hàng
               toàn quốc.
             </p>
           </div>
@@ -49,7 +49,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="border-t border-gray-700 mt-8 pt-6 text-center text-gray-500 text-xs">
-          © 2026 Cây Xanh. All rights reserved.
+          © 2026 Thế giới cây xanh. All rights reserved.
         </div>
       </div>
     </footer>

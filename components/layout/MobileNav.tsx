@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Home, Search, ShoppingCart, User } from "lucide-react";
 import { useCartStore } from "@/lib/stores/cartStore";
 import { cn } from "@/lib/utils/cn";
+import { useEffect, useState } from "react";
 
 const navItems = [
   { href: "/", icon: Home, label: "Trang chủ" },
@@ -16,6 +17,8 @@ const navItems = [
 export default function MobileNav() {
   const pathname = usePathname();
   const { itemCount } = useCartStore();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
 
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-plant-border">
@@ -34,7 +37,7 @@ export default function MobileNav() {
             >
               <div className="relative">
                 <Icon size={22} />
-                {isCart && itemCount() > 0 && (
+                {mounted && isCart && itemCount() > 0 && (
                   <span className="absolute -top-2 -right-2 bg-plant-accent text-white text-xs w-4 h-4 rounded-full flex items-center justify-center">
                     {itemCount()}
                   </span>

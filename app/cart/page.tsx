@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import { ShoppingBag } from "lucide-react";
+import { ShoppingBag, ArrowRight } from "lucide-react";
 import { useCart } from "@/lib/hooks/useCart";
 import { useCartStore } from "@/lib/stores/cartStore";
 import CartItem from "@/components/cart/CartItem";
@@ -11,16 +11,18 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 function CartSkeleton() {
   return (
-    <div className="space-y-4">
+    <div className="divide-y divide-plant-border/60">
       {[1, 2, 3].map((i) => (
-        <div key={i} className="flex gap-4 py-5 border-b border-plant-border">
-          <Skeleton className="w-20 h-20 rounded-xl" />
-          <div className="flex-1 space-y-2">
-            <Skeleton className="h-4 w-3/4" />
-            <Skeleton className="h-4 w-1/4" />
-            <Skeleton className="h-8 w-28 mt-2" />
+        <div key={i} className="flex gap-5 py-6">
+          <Skeleton className="w-24 h-24 rounded-xl shrink-0" />
+          <div className="flex-1 space-y-3">
+            <Skeleton className="h-4 w-2/3" />
+            <Skeleton className="h-3 w-1/3" />
+            <div className="flex items-center justify-between mt-4">
+              <Skeleton className="h-9 w-28 rounded-xl" />
+              <Skeleton className="h-5 w-20" />
+            </div>
           </div>
-          <Skeleton className="h-5 w-20" />
         </div>
       ))}
     </div>
@@ -33,7 +35,6 @@ export default function CartPage() {
 
   const beCart = query.data;
 
-  // Sync local store from BE cart so CartDrawer badge stays accurate
   useEffect(() => {
     if (beCart) {
       useCartStore.setState({
@@ -50,13 +51,13 @@ export default function CartPage() {
 
   if (query.isLoading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <h1 className="font-playfair text-3xl font-bold text-plant-text mb-8">Giỏ hàng</h1>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <Skeleton className="h-9 w-64 mb-8" />
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-8">
+          <div className="bg-white rounded-2xl border border-plant-border/60 shadow-sm px-6">
             <CartSkeleton />
           </div>
-          <Skeleton className="h-64 rounded-2xl" />
+          <Skeleton className="h-80 rounded-2xl" />
         </div>
       </div>
     );
@@ -64,12 +65,9 @@ export default function CartPage() {
 
   if (query.isError || !beCart) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-16 text-center">
+      <div className="max-w-6xl mx-auto px-4 py-20 text-center">
         <p className="text-plant-muted mb-4">Không thể tải giỏ hàng. Vui lòng thử lại.</p>
-        <button
-          onClick={() => query.refetch()}
-          className="text-plant-primary underline"
-        >
+        <button onClick={() => query.refetch()} className="text-plant-primary underline text-sm font-medium">
           Thử lại
         </button>
       </div>
@@ -78,29 +76,33 @@ export default function CartPage() {
 
   if (beCart.items.length === 0) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-16 text-center">
-        <ShoppingBag size={64} className="mx-auto text-plant-border mb-4" />
+      <div className="max-w-6xl mx-auto px-4 py-24 text-center">
+        <div className="w-20 h-20 rounded-2xl bg-plant-surface flex items-center justify-center mx-auto mb-6 ring-1 ring-plant-border/60">
+          <ShoppingBag size={36} className="text-plant-border" />
+        </div>
         <h1 className="font-playfair text-2xl font-bold text-plant-text mb-2">Giỏ hàng trống</h1>
-        <p className="text-plant-muted mb-6">Hãy thêm sản phẩm vào giỏ hàng nhé!</p>
+        <p className="text-plant-muted mb-8">Bạn chưa có sản phẩm nào trong giỏ hàng.</p>
         <Link
           href="/products"
-          className="inline-block bg-plant-primary hover:bg-plant-primary-light text-white font-semibold px-8 py-3 rounded-xl transition-colors"
+          className="inline-flex items-center gap-2 bg-plant-primary hover:bg-plant-primary-light text-white font-semibold px-8 py-3 rounded-xl transition-all shadow-sm hover:shadow-md"
         >
-          Khám phá sản phẩm
+          Khám phá sản phẩm <ArrowRight size={16} />
         </Link>
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <h1 className="font-playfair text-3xl font-bold text-plant-text mb-8">
-        Giỏ hàng ({beCart.itemCount} sản phẩm)
-      </h1>
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      {/* Header */}
+      <div className="flex items-baseline gap-3 mb-8">
+        <h1 className="font-playfair text-3xl font-bold text-plant-text">Giỏ hàng</h1>
+        <span className="text-plant-muted text-[15px]">{beCart.itemCount} sản phẩm</span>
+      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Cart items */}
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-plant-border px-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-8 items-start">
+        {/* Items card */}
+        <div className="bg-white rounded-2xl border border-plant-border/60 shadow-sm px-6 divide-y divide-plant-border/50">
           {beCart.items.map((item) => (
             <CartItem
               key={item.id}
@@ -115,8 +117,8 @@ export default function CartPage() {
           ))}
         </div>
 
-        {/* Order summary (sticky on desktop) */}
-        <div className="lg:sticky lg:top-24 self-start">
+        {/* Summary sticky */}
+        <div className="lg:sticky lg:top-24">
           <CartSummary subtotal={beCart.subtotal} />
         </div>
       </div>

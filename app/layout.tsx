@@ -20,7 +20,7 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Cây Xanh — Garden & Plant Store",
+  title: "Thế giới cây xanh — Garden & Plant Store",
   description: "Mang thiên nhiên vào ngôi nhà của bạn",
 };
 
@@ -34,7 +34,7 @@ export default function RootLayout({
       lang="vi"
       className={`${playfairDisplay.variable} ${dmSans.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-plant-surface text-plant-text">
+      <body suppressHydrationWarning className="min-h-full flex flex-col bg-plant-surface text-plant-text">
         <Providers>
           <Header />
           <main className="flex-1 pb-16 md:pb-0">{children}</main>

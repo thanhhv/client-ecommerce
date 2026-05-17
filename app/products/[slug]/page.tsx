@@ -27,13 +27,13 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const product = await getProduct(slug);
-  if (!product) return { title: "Sản phẩm không tìm thấy | Cây Xanh" };
+  if (!product) return { title: "Sản phẩm không tìm thấy | Thế giới cây xanh" };
   const primaryImage = product.images.find((img) => img.isPrimary) ?? product.images[0];
   return {
-    title: `${product.name} | Cây Xanh`,
+    title: `${product.name} | Thế giới cây xanh`,
     description:
       product.description?.slice(0, 160) ??
-      `Mua ${product.name} tại Cây Xanh. Giao hàng toàn quốc, cây tươi đảm bảo.`,
+      `Mua ${product.name} tại Thế giới cây xanh. Giao hàng toàn quốc, cây tươi đảm bảo.`,
     openGraph: {
       title: product.name,
       description: product.description ?? undefined,

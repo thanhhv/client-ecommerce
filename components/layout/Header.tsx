@@ -7,6 +7,7 @@ import { useCartStore } from "@/lib/stores/cartStore";
 import { useAuthStore } from "@/lib/stores/authStore";
 import { authApi } from "@/lib/api/auth";
 import { toast } from "sonner";
+import { useEffect, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,6 +19,8 @@ export default function Header() {
   const { itemCount, setDrawerOpen } = useCartStore();
   const { user, logout } = useAuthStore();
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
 
   async function handleLogout() {
     try {
@@ -37,7 +40,7 @@ export default function Header() {
           href="/"
           className="font-playfair text-xl font-bold text-plant-primary"
         >
-          🌿 Cây Xanh
+          🌿 Thế giới cây xanh
         </Link>
 
         <nav className="hidden md:flex items-center gap-6">
@@ -62,7 +65,7 @@ export default function Header() {
             aria-label="Giỏ hàng"
           >
             <ShoppingCart size={20} className="text-plant-text" />
-            {itemCount() > 0 && (
+            {mounted && itemCount() > 0 && (
               <span className="absolute -top-1 -right-1 bg-plant-accent text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-medium">
                 {itemCount() > 99 ? "99+" : itemCount()}
               </span>

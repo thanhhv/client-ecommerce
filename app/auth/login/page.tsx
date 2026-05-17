@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { authApi } from "@/lib/api/auth";
+import { markAuthOk } from "@/lib/api/client";
 import { useAuthStore } from "@/lib/stores/authStore";
 import axios from "axios";
 
@@ -32,6 +33,7 @@ function LoginContent() {
     try {
       const res = await authApi.login({ email, password });
       const { accessToken, user } = res.data.data;
+      markAuthOk();
       setAuth(
         {
           id: user.id,

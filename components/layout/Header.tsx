@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ShoppingCart, User, Menu } from "lucide-react";
+import { ShoppingCart, User, Menu, UserCircle, PackageSearch, LogOut, LogIn } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/lib/stores/cartStore";
 import { useAuthStore } from "@/lib/stores/authStore";
@@ -12,6 +12,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
@@ -77,33 +78,61 @@ export default function Header() {
               className="p-2 hover:bg-plant-surface rounded-lg transition-colors"
               aria-label="Tài khoản"
             >
-              <User size={20} className="text-plant-text" />
+              {mounted && user?.avatar ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={user.avatar} alt={user.name} className="w-7 h-7 rounded-full object-cover ring-2 ring-plant-border" />
+              ) : (
+                <User size={20} className="text-plant-text" />
+              )}
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuContent align="end" className="w-56 p-1.5">
               {user ? (
                 <>
-                  <DropdownMenuItem>
-                    <Link href="/profile" className="w-full">
-                      Hồ sơ của tôi
+                  {/* User info header */}
+                  <div className="flex items-center gap-3 px-2 py-2.5 mb-1">
+                    <div className="w-9 h-9 rounded-full bg-plant-primary/10 flex items-center justify-center shrink-0 overflow-hidden">
+                      {user.avatar ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="text-plant-primary font-semibold text-sm">
+                          {user.name?.charAt(0).toUpperCase() ?? "U"}
+                        </span>
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-plant-text truncate">{user.name}</p>
+                      <p className="text-xs text-plant-muted truncate">{user.email}</p>
+                    </div>
+                  </div>
+                  <DropdownMenuSeparator className="mx-1 mb-1" />
+                  <DropdownMenuItem className="gap-2.5 px-2 py-2 cursor-pointer rounded-md p-0">
+                    <Link href="/profile" className="flex items-center gap-2.5 w-full px-2 py-2">
+                      <UserCircle size={16} className="text-plant-muted shrink-0" />
+                      <span>Hồ sơ của tôi</span>
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Link href="/orders" className="w-full">
-                      Đơn hàng của tôi
+                  <DropdownMenuItem className="gap-2.5 px-2 py-2 cursor-pointer rounded-md p-0">
+                    <Link href="/orders" className="flex items-center gap-2.5 w-full px-2 py-2">
+                      <PackageSearch size={16} className="text-plant-muted shrink-0" />
+                      <span>Đơn hàng của tôi</span>
                     </Link>
                   </DropdownMenuItem>
+                  <DropdownMenuSeparator className="mx-1 mt-1" />
                   <DropdownMenuItem
                     variant="destructive"
-                    className="cursor-pointer"
+                    className="gap-2.5 px-2 py-2 cursor-pointer rounded-md mt-0.5"
                     onClick={handleLogout}
                   >
-                    Đăng xuất
+                    <LogOut size={16} className="shrink-0" />
+                    <span>Đăng xuất</span>
                   </DropdownMenuItem>
                 </>
               ) : (
-                <DropdownMenuItem>
-                  <Link href="/auth/login" className="w-full">
-                    Đăng nhập
+                <DropdownMenuItem className="gap-2.5 cursor-pointer rounded-md p-0">
+                  <Link href="/auth/login" className="flex items-center gap-2.5 w-full px-2 py-2">
+                    <LogIn size={16} className="text-plant-muted shrink-0" />
+                    <span>Đăng nhập</span>
                   </Link>
                 </DropdownMenuItem>
               )}

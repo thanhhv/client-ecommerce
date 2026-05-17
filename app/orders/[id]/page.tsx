@@ -16,11 +16,11 @@ import type { ElementType } from "react";
 interface OrderItem {
   id: string;
   productId: string | null;
-  productNameSnapshot: string;
-  productImageSnapshot: string | null;
+  productName: string;
+  productImage: string | null;
   quantity: number;
   unitPrice: number;
-  totalPrice: number;
+  lineTotal: number;
 }
 
 interface OrderDetail {
@@ -177,13 +177,14 @@ export default function OrderDetailPage() {
           {order.items.map((item) => (
             <div key={item.id} className="flex gap-4">
               <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-plant-surface border border-plant-border shrink-0">
-                {item.productImageSnapshot ? (
+                {item.productImage ? (
                   <Image
-                    src={item.productImageSnapshot}
-                    alt={item.productNameSnapshot}
+                    src={item.productImage}
+                    alt={item.productName}
                     fill
                     className="object-cover"
                     sizes="64px"
+                    unoptimized
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-xl">🌿</div>
@@ -191,14 +192,14 @@ export default function OrderDetailPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-medium text-plant-text text-sm line-clamp-2">
-                  {item.productNameSnapshot}
+                  {item.productName}
                 </p>
                 <p className="text-xs text-plant-muted mt-0.5">
                   {formatCurrency(item.unitPrice)} × {item.quantity}
                 </p>
               </div>
               <p className="font-semibold text-plant-text shrink-0 text-sm">
-                {formatCurrency(item.totalPrice)}
+                {formatCurrency(Number(item.lineTotal))}
               </p>
             </div>
           ))}

@@ -1,8 +1,10 @@
 import axios from "axios";
 import { useAuthStore } from "@/lib/stores/authStore";
 
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
 const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001",
+  baseURL: BASE_URL,
   withCredentials: true,
 });
 
@@ -15,59 +17,83 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
-// On 401: silently refresh the token and retry the original request once.
-// If the refresh also fails the user is logged out and sent to /auth/login.
-let isRefreshing = false;
-let refreshQueue: Array<(token: string) => void> = [];
+// --- Refresh state (module-level, shared across all in-flight requests) ---
+
+// Single in-flight refresh promise — all concurrent 401s wait on the same call.
+let refreshPromise: Promise<string> | null = null;
+
+// Once refresh fails, stop retrying until the user authenticates again.
+// Prevents hammering /auth/refresh when the cookie is simply gone.
+let refreshBroken = false;
+
+// Called by login / OAuth callback after a successful sign-in.
+export function markAuthOk() {
+  refreshBroken = false;
+  refreshPromise = null;
+}
+
+function redirectToLogin() {
+  if (typeof window === "undefined") return;
+  const path = window.location.pathname;
+  // Never redirect to login from an auth page — that's the infinite loop.
+  if (path.startsWith("/auth/")) return;
+  window.location.href = `/auth/login?redirect=${encodeURIComponent(path)}`;
+}
 
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     const original = error.config;
 
-    if (error.response?.status !== 401 || original._retried) {
+    // Skip retry when:
+    // • Not a 401
+    // • Already retried this request
+    // • The failing request IS the refresh endpoint (recursive refresh = the bug)
+    // • The failing request is logout (no point retrying)
+    // • We already know refresh is broken this session
+    if (
+      error.response?.status !== 401 ||
+      original._retried ||
+      original.url?.includes("/auth/refresh") ||
+      original.url?.includes("/auth/logout") ||
+      refreshBroken
+    ) {
       return Promise.reject(error);
     }
+
     original._retried = true;
 
-    if (isRefreshing) {
-      // Queue this request until the in-flight refresh resolves
-      return new Promise((resolve) => {
-        refreshQueue.push((newToken: string) => {
-          original.headers.Authorization = `Bearer ${newToken}`;
-          resolve(apiClient(original));
+    // If no refresh is in-flight, start one. All concurrent 401s share this promise.
+    if (!refreshPromise) {
+      refreshPromise = axios
+        .post<{ data: { accessToken: string } }>(
+          `${BASE_URL}/api/v1/auth/refresh`,
+          {},
+          { withCredentials: true },
+        )
+        .then((res) => {
+          const newToken = res.data.data.accessToken;
+          const { user } = useAuthStore.getState();
+          if (user) useAuthStore.getState().setAuth(user, newToken);
+          return newToken;
+        })
+        .catch((err) => {
+          refreshBroken = true;
+          useAuthStore.getState().logout();
+          redirectToLogin();
+          throw err;
+        })
+        .finally(() => {
+          refreshPromise = null;
         });
-      });
     }
 
-    isRefreshing = true;
     try {
-      const res = await axios.post<{ data: { accessToken: string } }>(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/api/v1/auth/refresh`,
-        {},
-        { withCredentials: true },
-      );
-      const newToken = res.data.data.accessToken;
-
-      // Update store with new token (keep existing user)
-      const { user } = useAuthStore.getState();
-      if (user) useAuthStore.getState().setAuth(user, newToken);
-
-      // Flush queued requests
-      refreshQueue.forEach((cb) => cb(newToken));
-      refreshQueue = [];
-
+      const newToken = await refreshPromise;
       original.headers.Authorization = `Bearer ${newToken}`;
       return apiClient(original);
     } catch {
-      // Refresh failed — clear session and redirect to login
-      useAuthStore.getState().logout();
-      if (typeof window !== "undefined") {
-        window.location.href = `/auth/login?redirect=${encodeURIComponent(window.location.pathname)}`;
-      }
       return Promise.reject(error);
-    } finally {
-      isRefreshing = false;
     }
   },
 );

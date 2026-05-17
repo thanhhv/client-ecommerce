@@ -4,6 +4,7 @@ import { useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/lib/stores/authStore";
 import { authApi } from "@/lib/api/auth";
+import { markAuthOk } from "@/lib/api/client";
 
 function CallbackContent() {
   const router = useRouter();
@@ -21,6 +22,7 @@ function CallbackContent() {
         const profileRes = await authApi.getProfile();
         const user = profileRes.data.data;
 
+        markAuthOk();
         setAuth(
           {
             id: user.id,

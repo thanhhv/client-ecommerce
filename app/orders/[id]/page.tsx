@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -9,6 +10,16 @@ import { ordersApi } from "@/lib/api/orders";
 import { formatCurrency } from "@/lib/utils/formatCurrency";
 import { formatDate } from "@/lib/utils/formatDate";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS, type OrderStatus } from "@/lib/utils/orderStatus";
 import { ArrowLeft, Package, CheckCircle, Truck, Home, XCircle } from "lucide-react";
 import type { ElementType } from "react";
@@ -101,6 +112,7 @@ export default function OrderDetailPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const orderId = params.id as string;
+  const [cancelOpen, setCancelOpen] = useState(false);
 
   const query = useQuery<OrderDetail>({
     queryKey: ["order", orderId],
@@ -122,6 +134,7 @@ export default function OrderDetailPage() {
   });
 
   const order = query.data;
+  const isError = query.isError;
 
   if (query.isLoading) {
     return (
@@ -130,6 +143,17 @@ export default function OrderDetailPage() {
         <Skeleton className="h-32 rounded-2xl" />
         <Skeleton className="h-48 rounded-2xl" />
         <Skeleton className="h-32 rounded-2xl" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-16 text-center">
+        <p className="text-plant-muted mb-4">Có lỗi xảy ra, vui lòng thử lại.</p>
+        <button onClick={() => query.refetch()} className="text-plant-primary underline text-sm">
+          Thử lại
+        </button>
       </div>
     );
   }
@@ -258,11 +282,7 @@ export default function OrderDetailPage() {
             Bạn có thể huỷ đơn hàng khi đơn đang ở trạng thái <strong>Chờ xác nhận</strong>.
           </p>
           <button
-            onClick={() => {
-              if (confirm("Bạn có chắc muốn huỷ đơn hàng này?")) {
-                cancelMutation.mutate();
-              }
-            }}
+            onClick={() => setCancelOpen(true)}
             disabled={cancelMutation.isPending}
             className="px-6 py-2.5 border-2 border-red-400 text-red-600 hover:bg-red-100 font-medium rounded-xl transition-colors disabled:opacity-50 text-sm"
           >
@@ -270,6 +290,26 @@ export default function OrderDetailPage() {
           </button>
         </div>
       )}
+
+      <AlertDialog open={cancelOpen} onOpenChange={setCancelOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Huỷ đơn hàng?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Hành động này không thể hoàn tác. Bạn có chắc muốn huỷ đơn hàng này?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Không</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => { cancelMutation.mutate(); setCancelOpen(false); }}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              Huỷ đơn hàng
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

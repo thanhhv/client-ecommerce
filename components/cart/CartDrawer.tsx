@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import {
   Sheet,
   SheetContent,
@@ -27,9 +28,9 @@ export default function CartDrawer() {
   // For logged-in users prefer BE cart; fall back to local store when BE is
   // loading/refetching (e.g. right after add-to-cart invalidates the cache)
   const isLoggedIn = !!user;
-  const beCart = isLoggedIn && !query.isFetching ? query.data ?? null : null;
+  const beCart = isLoggedIn ? query.data ?? null : null;
 
-  const localAsBe: BeCartItem[] = localItems.map((i) => ({
+  const localAsBe = useMemo<BeCartItem[]>(() => localItems.map((i) => ({
     id: i.productId,
     productId: i.productId,
     productName: i.name,
@@ -39,7 +40,7 @@ export default function CartDrawer() {
     priceSnapshot: i.price,
     lineTotal: i.price * i.quantity,
     currentStock: 9999,
-  }));
+  })), [localItems]);
 
   const items: BeCartItem[] = beCart ? beCart.items : localAsBe;
   const sub = beCart ? beCart.subtotal : localSubtotal();

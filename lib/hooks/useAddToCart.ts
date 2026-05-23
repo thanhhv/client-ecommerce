@@ -2,6 +2,7 @@
 
 import { useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { useAuthStore } from "@/lib/stores/authStore";
 import { useCartStore, type CartItem } from "@/lib/stores/cartStore";
 import { cartApi } from "@/lib/api/cart";
@@ -26,7 +27,9 @@ export function useAddToCart() {
           // Invalidate so CartDrawer and checkout page see the new item
           queryClient.invalidateQueries({ queryKey: ["cart"] });
         } catch {
-          // Silent fail — local store already updated
+          // Rollback optimistic update and notify user
+          useCartStore.getState().removeItem(item.productId);
+          toast.error('Không thể thêm vào giỏ hàng. Vui lòng thử lại.');
         }
       }
     },

@@ -73,8 +73,8 @@ apiClient.interceptors.response.use(
         )
         .then((res) => {
           const newToken = res.data.data.accessToken;
-          const { user } = useAuthStore.getState();
-          if (user) useAuthStore.getState().setAuth(user, newToken);
+          const currentUser = useAuthStore.getState().user;
+          if (currentUser) useAuthStore.getState().setAuth(currentUser, newToken);
           return newToken;
         })
         .catch((err) => {

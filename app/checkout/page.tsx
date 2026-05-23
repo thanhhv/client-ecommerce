@@ -14,6 +14,7 @@ import AddressForm from "@/components/checkout/AddressForm";
 import PaymentMethodSelect from "@/components/checkout/PaymentMethodSelect";
 import OrderSummary from "@/components/checkout/OrderSummary";
 import { Skeleton } from "@/components/ui/skeleton";
+import type { BeCart } from "@/lib/types/cart";
 
 type PaymentMethod = "COD" | "BANK_TRANSFER";
 
@@ -29,24 +30,6 @@ interface FormErrors {
   shippingName?: string;
   shippingPhone?: string;
   shippingAddress?: string;
-}
-
-interface BeCartItem {
-  id: string;
-  productId: string;
-  productName: string;
-  productImageUrl: string | null;
-  quantity: number;
-  priceSnapshot: number;
-  lineTotal: number;
-  currentStock: number;
-}
-
-interface BeCart {
-  id: string;
-  items: BeCartItem[];
-  subtotal: number;
-  itemCount: number;
 }
 
 function validate(data: FormData): FormErrors {
@@ -99,9 +82,26 @@ export default function CheckoutPage() {
   });
   const [errors, setErrors] = useState<FormErrors>({});
 
+  const profileQuery = useQuery<{ name: string | null; phone: string | null; address: string | null }>({
+    queryKey: ["profile"],
+    queryFn: async () => {
+      const { authApi } = await import("@/lib/api/auth");
+      const res = await authApi.getProfile();
+      return res.data.data;
+    },
+    enabled: !!user,
+  });
+
   useEffect(() => {
-    if (user?.name) setForm((f) => ({ ...f, shippingName: user.name! }));
-  }, [user?.name]);
+    const profile = profileQuery.data;
+    if (!profile) return;
+    setForm((f) => ({
+      ...f,
+      shippingName: profile.name ?? f.shippingName,
+      shippingPhone: profile.phone ?? f.shippingPhone,
+      shippingAddress: profile.address ?? f.shippingAddress,
+    }));
+  }, [profileQuery.data]);
 
   const cartQuery = useQuery<BeCart>({
     queryKey: ["cart"],

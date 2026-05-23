@@ -41,6 +41,10 @@ export default function ProductImageGallery({
   // Keyboard navigation
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
+      // Don't intercept arrow keys when user is typing in an input
+      const tag = (e.target as HTMLElement).tagName.toLowerCase();
+      if (tag === "input" || tag === "textarea" || tag === "select") return;
+
       if (e.key === "ArrowLeft") prev();
       else if (e.key === "ArrowRight") next();
     };

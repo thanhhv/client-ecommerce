@@ -45,7 +45,14 @@ export default function OrdersPage() {
     <div className="max-w-4xl mx-auto px-4 py-8">
       <h1 className="font-playfair text-3xl font-bold text-plant-text mb-8">Đơn hàng của tôi</h1>
 
-      {query.isLoading ? (
+      {query.isError ? (
+        <div className="max-w-4xl mx-auto px-4 py-16 text-center">
+          <p className="text-plant-muted mb-4">Không thể tải danh sách đơn hàng.</p>
+          <button onClick={() => query.refetch()} className="text-plant-primary underline text-sm">
+            Thử lại
+          </button>
+        </div>
+      ) : query.isLoading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
             <Skeleton key={i} className="h-24 rounded-2xl" />

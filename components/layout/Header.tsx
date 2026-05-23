@@ -35,7 +35,7 @@ export default function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-plant-border shadow-sm">
+    <header className="sticky top-0 z-50 bg-white/85 backdrop-blur-xl border-b border-plant-border/50">
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
         <Link
           href="/"
@@ -75,12 +75,23 @@ export default function Header() {
 
           <DropdownMenu>
             <DropdownMenuTrigger
-              className="p-2 hover:bg-plant-surface rounded-lg transition-colors"
+              className="flex items-center gap-1.5 px-2 py-1.5 hover:bg-plant-surface rounded-lg transition-colors"
               aria-label="Tài khoản"
             >
-              {mounted && user?.avatar ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={user.avatar} alt={user.name} className="w-7 h-7 rounded-full object-cover ring-2 ring-plant-border" />
+              {mounted && user ? (
+                <>
+                  {user.avatar ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={user.avatar} alt={user.name} className="w-7 h-7 rounded-full object-cover ring-2 ring-plant-primary/30" />
+                  ) : (
+                    <span className="w-7 h-7 rounded-full bg-plant-primary text-white text-xs font-semibold flex items-center justify-center shrink-0">
+                      {user.name?.charAt(0).toUpperCase() ?? "U"}
+                    </span>
+                  )}
+                  <span className="hidden md:block text-sm font-medium text-plant-text max-w-[96px] truncate">
+                    {user.name?.split(" ").at(-1)}
+                  </span>
+                </>
               ) : (
                 <User size={20} className="text-plant-text" />
               )}

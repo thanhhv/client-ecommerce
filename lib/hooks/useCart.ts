@@ -3,9 +3,11 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { cartApi } from "@/lib/api/cart";
 import type { BeCart } from "@/lib/types/cart";
+import { useAuthStore } from "@/lib/stores/authStore";
 
 export function useCart() {
   const queryClient = useQueryClient();
+  const user = useAuthStore((s) => s.user);
 
   const query = useQuery<BeCart>({
     queryKey: ["cart"],
@@ -14,6 +16,7 @@ export function useCart() {
       return res.data.data;
     },
     staleTime: 0,
+    enabled: !!user,
   });
 
   const updateItem = useMutation({

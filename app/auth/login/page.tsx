@@ -59,8 +59,25 @@ function LoginContent() {
   }
 
   return (
-    <div className="min-h-screen bg-plant-surface flex items-center justify-center px-4">
-      <div className="w-full max-w-sm bg-white rounded-2xl shadow-lg p-8 flex flex-col items-center gap-6">
+    <div className="min-h-screen flex">
+      {/* Left decorative panel — desktop only */}
+      <div className="hidden lg:flex lg:w-1/2 bg-[#0d2010] relative overflow-hidden flex-col items-center justify-center p-12">
+        <div className="absolute -top-20 -left-20 w-80 h-80 rounded-full bg-[#1e4d1a]/60 blur-[80px]" />
+        <div className="absolute bottom-0 right-0 w-64 h-64 rounded-full bg-[#2d5a28]/50 blur-[60px]" />
+        <div className="relative text-center">
+          <div className="text-8xl mb-6">🌿</div>
+          <h2 className="font-playfair text-4xl font-bold text-white mb-3 leading-tight">
+            Mang thiên nhiên<br />vào ngôi nhà bạn
+          </h2>
+          <p className="text-white/50 text-sm max-w-xs leading-relaxed">
+            Hơn 500 loại cây xanh, hoa và dụng cụ làm vườn. Giao hàng toàn quốc.
+          </p>
+        </div>
+      </div>
+
+      {/* Right: form panel */}
+      <div className="flex-1 bg-plant-surface flex items-center justify-center px-6 py-12">
+      <div className="w-full max-w-sm bg-white rounded-3xl shadow-sm p-8 flex flex-col items-center gap-6">
         <Link href="/" className="font-playfair text-2xl font-bold text-plant-primary">
           🌿 Thế giới cây xanh
         </Link>
@@ -195,6 +212,7 @@ function LoginContent() {
           Bằng cách đăng nhập, bạn đồng ý với{" "}
           <span className="text-plant-primary">điều khoản dịch vụ</span> của chúng tôi.
         </p>
+      </div>
       </div>
     </div>
   );

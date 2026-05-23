@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, Suspense } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { authApi } from "@/lib/api/auth";
 import { markAuthOk } from "@/lib/api/client";
@@ -29,8 +29,10 @@ function isValidEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
-export default function RegisterPage() {
+function RegisterContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect") || "/";
   const { setAuth } = useAuthStore();
 
   const [fields, setFields] = useState<FormFields>({
@@ -112,7 +114,7 @@ export default function RegisterPage() {
         },
         accessToken
       );
-      router.replace("/");
+      router.replace(redirect);
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
         setServerError(
@@ -307,5 +309,13 @@ export default function RegisterPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense>
+      <RegisterContent />
+    </Suspense>
   );
 }

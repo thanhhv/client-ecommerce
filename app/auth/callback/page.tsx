@@ -11,7 +11,10 @@ function CallbackContent() {
   const searchParams = useSearchParams();
   const setAuth = useAuthStore((s) => s.setAuth);
 
+  const error = searchParams.get("error");
+
   useEffect(() => {
+    if (error) return; // Don't attempt auth when there's already an error param
     async function handleCallback() {
       try {
         // Try to restore session using the refresh_token cookie set by backend
@@ -37,11 +40,25 @@ function CallbackContent() {
         const redirect = searchParams.get("redirect") || "/";
         router.replace(redirect);
       } catch {
-        router.replace("/auth/login?error=oauth_failed");
+        router.replace("/auth/callback?error=oauth_failed");
       }
     }
     handleCallback();
-  }, [router, searchParams, setAuth]);
+  }, [router, searchParams, setAuth, error]);
+
+  if (error === "oauth_failed") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-plant-surface">
+        <div className="text-center">
+          <p className="text-red-600 mb-2 font-medium">Đăng nhập thất bại</p>
+          <p className="text-plant-muted text-sm">Vui lòng thử lại hoặc dùng email để đăng nhập.</p>
+          <a href="/auth/login" className="mt-4 inline-block text-plant-primary underline text-sm">
+            Quay lại đăng nhập
+          </a>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-plant-surface">

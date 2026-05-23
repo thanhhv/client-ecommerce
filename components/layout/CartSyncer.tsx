@@ -10,7 +10,6 @@ import { cartApi } from "@/lib/api/cart";
 // Runs once per login event; skips if the local cart is empty.
 export default function CartSyncer() {
   const user = useAuthStore((s) => s.user);
-  const items = useCartStore((s) => s.items);
   const prevUserId = useRef<string | null>(null);
   const queryClient = useQueryClient();
 
@@ -21,7 +20,8 @@ export default function CartSyncer() {
     if (!justLoggedIn) return;
 
     const sync = async () => {
-      for (const item of items) {
+      const localItems = useCartStore.getState().items;
+      for (const item of localItems) {
         try {
           await cartApi.addItem({ productId: item.productId, quantity: item.quantity });
         } catch {
@@ -32,7 +32,7 @@ export default function CartSyncer() {
       queryClient.invalidateQueries({ queryKey: ["cart"] });
     };
     sync();
-  }, [user, items, queryClient]);
+  }, [user?.id, queryClient]);
 
   return null;
 }

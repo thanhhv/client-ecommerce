@@ -69,6 +69,21 @@ export default function ProfilePage() {
     setIsDirty(true);
   }
 
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+
+    if (!form.name?.trim()) {
+      toast.error('Vui lòng nhập họ tên');
+      return;
+    }
+    if (form.phone && !/^(0|\+84)[0-9]{8,10}$/.test(form.phone.replace(/\s/g, ''))) {
+      toast.error('Số điện thoại không hợp lệ');
+      return;
+    }
+
+    updateMutation.mutate(form);
+  }
+
   const profile = profileQuery.data;
 
   const inputClass =
@@ -147,7 +162,7 @@ export default function ProfilePage() {
         </div>
 
         <button
-          onClick={() => updateMutation.mutate(form)}
+          onClick={handleSubmit}
           disabled={!isDirty || updateMutation.isPending}
           className="w-full bg-plant-primary hover:bg-plant-primary-light text-white font-semibold py-3 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >

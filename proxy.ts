@@ -3,6 +3,19 @@ import type { NextRequest } from "next/server";
 
 const protectedPaths = ["/cart", "/checkout", "/orders", "/profile"];
 
+/**
+ * Next.js Edge Middleware — Route Protection
+ *
+ * LIMITATION: This middleware checks for the presence of a `refresh_token`
+ * cookie (set as httpOnly by the backend on login/refresh). It cannot validate
+ * the token itself at the edge — an expired or forged cookie will still pass
+ * this guard. True validation happens server-side when the first authenticated
+ * API call is made, at which point the client-side interceptor in lib/api/client.ts
+ * will redirect to /auth/login.
+ *
+ * This guard exists to prevent the flash of authenticated-looking UI for users
+ * who are clearly unauthenticated (no cookie at all).
+ */
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isProtected = protectedPaths.some((path) =>

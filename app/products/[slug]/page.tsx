@@ -8,7 +8,7 @@ import type { ProductDetail } from "@/lib/types/product";
 
 async function getProduct(slug: string): Promise<ProductDetail | null> {
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
+    const apiUrl = process.env.API_INTERNAL_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
     const res = await fetch(`${apiUrl}/api/v1/products/${slug}`, {
       next: { revalidate: 60 },
     });

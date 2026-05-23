@@ -1,10 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
 import Link from "next/link";
 import { ShoppingBag, ArrowRight } from "lucide-react";
 import { useCart } from "@/lib/hooks/useCart";
-import { useCartStore } from "@/lib/stores/cartStore";
 import CartItem from "@/components/cart/CartItem";
 import CartSummary from "@/components/cart/CartSummary";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -31,23 +29,8 @@ function CartSkeleton() {
 
 export default function CartPage() {
   const { query, updateItem, removeItem } = useCart();
-  const { clear: clearLocalCart } = useCartStore();
 
   const beCart = query.data;
-
-  useEffect(() => {
-    if (beCart) {
-      useCartStore.setState({
-        items: beCart.items.map((item) => ({
-          productId: item.productId,
-          name: item.productName,
-          imageUrl: item.productImageUrl ?? "",
-          price: item.priceSnapshot,
-          quantity: item.quantity,
-        })),
-      });
-    }
-  }, [beCart]);
 
   if (query.isLoading) {
     return (

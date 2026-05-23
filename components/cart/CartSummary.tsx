@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { ShieldCheck, Tag, Truck, ChevronRight } from "lucide-react";
+import { ShieldCheck, Truck, ChevronRight } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/formatCurrency";
 
 const FREE_SHIPPING_THRESHOLD = 500_000;
@@ -13,7 +12,6 @@ interface CartSummaryProps {
 }
 
 export default function CartSummary({ subtotal }: CartSummaryProps) {
-  const [coupon, setCoupon] = useState("");
   const shippingFee = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;
   const total = subtotal + shippingFee;
   const remaining = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
@@ -41,22 +39,6 @@ export default function CartSummary({ subtotal }: CartSummaryProps) {
               style={{ width: `${progress}%` }}
             />
           </div>
-        </div>
-
-        {/* Coupon code */}
-        <div className="flex gap-2">
-          <div className="flex-1 flex items-center gap-2 border border-plant-border rounded-xl px-3 py-2.5 focus-within:ring-2 focus-within:ring-plant-primary/15 focus-within:border-plant-primary/60 transition-all bg-white">
-            <Tag size={14} className="text-plant-muted shrink-0" />
-            <input
-              value={coupon}
-              onChange={(e) => setCoupon(e.target.value.toUpperCase())}
-              placeholder="Mã giảm giá"
-              className="flex-1 text-sm text-plant-text placeholder:text-plant-muted/60 bg-transparent outline-none font-medium tracking-wider"
-            />
-          </div>
-          <button className="px-4 py-2 bg-plant-surface hover:bg-plant-border/60 text-plant-text text-sm font-medium rounded-xl transition-colors whitespace-nowrap">
-            Áp dụng
-          </button>
         </div>
 
         {/* Price breakdown */}

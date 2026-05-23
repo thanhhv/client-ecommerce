@@ -19,18 +19,24 @@ export default function ProductInfo({ product }: ProductInfoProps) {
   const { setDrawerOpen } = useCartStore();
   const addToCart = useAddToCart();
   const [qty, setQty] = useState(1);
+  const [adding, setAdding] = useState(false);
 
   const primaryImage = product.images.find((img) => img.isPrimary) ?? product.images[0];
 
   async function handleAddToCart() {
-    await addToCart({
-      productId: product.id,
-      name: product.name,
-      imageUrl: primaryImage?.url ?? "",
-      price: product.salePrice ?? product.basePrice,
-      quantity: qty,
-    });
-    setDrawerOpen(true);
+    setAdding(true);
+    try {
+      await addToCart({
+        productId: product.id,
+        name: product.name,
+        imageUrl: primaryImage?.url ?? "",
+        price: product.salePrice ?? product.basePrice,
+        quantity: qty,
+      });
+      setDrawerOpen(true);
+    } finally {
+      setAdding(false);
+    }
   }
 
   async function handleBuyNow() {
@@ -104,15 +110,20 @@ export default function ProductInfo({ product }: ProductInfoProps) {
       <div className="flex flex-col sm:flex-row gap-3">
         <button
           onClick={handleAddToCart}
-          disabled={product.stock === 0}
+          disabled={adding || product.stock === 0}
           className="flex-1 flex items-center justify-center gap-2 bg-plant-primary hover:bg-plant-primary-light text-white font-semibold py-3 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <ShoppingCart size={18} />
-          Thêm vào giỏ hàng
+          {adding ? (
+            <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
+            </svg>
+          ) : <ShoppingCart size={18} />}
+          {adding ? 'Đang thêm...' : 'Thêm vào giỏ hàng'}
         </button>
         <button
           onClick={handleBuyNow}
-          disabled={product.stock === 0}
+          disabled={adding || product.stock === 0}
           className="flex-1 flex items-center justify-center gap-2 border-2 border-plant-primary text-plant-primary hover:bg-green-50 font-semibold py-3 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Zap size={18} />
